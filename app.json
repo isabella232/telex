@@ -1,0 +1,10 @@
+{
+  "name": "telex",
+  "description": "Notification Plexer.",
+  "stack": "heroku-18",
+  "buildpacks": [
+    {
+      "url": "heroku/ruby"
+    }
+  ]
+}
