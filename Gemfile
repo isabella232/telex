@@ -11,7 +11,7 @@ gem "multi_json"
 gem "oj"
 gem "pg"
 gem "pliny", "~> 0.16"
-gem "pry", require: false
+gem "pry", require: false # Make Pry available in production `heroku console` sessions
 gem "pry-doc", require: false
 gem "puma", "~> 3.11"
 gem "rack-ssl"
@@ -39,7 +39,6 @@ end
 
 group :development do
   gem "dotenv"
-  gem "foreman"
 end
 
 group :test do
