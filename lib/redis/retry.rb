@@ -1,3 +1,5 @@
+require "active_support/core_ext/numeric/time"
+
 class Redis
   module Retry
     class Error < StandardError; end
