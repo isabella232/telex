@@ -40,19 +40,20 @@ module Middleware
       end
 
       describe "with correct credentials" do
+        let(:user_info) { HerokuAPIMock.create_heroku_user }
+
         before do
           expect(app).to receive(:call).at_least(:once).with(rack_env)
-          @user_info = HerokuAPIMock.create_heroku_user
-          allow(rack_auth).to receive_messages(provided?: true, basic?: true, credentials: ["", @user_info.api_key])
+          allow(rack_auth).to receive_messages(provided?: true, basic?: true, credentials: ["", user_info.api_key])
         end
 
         it "finds the right user with matching heroku_id" do
-          existing_user = User.create(heroku_id: @user_info.heroku_id, email: @user_info.email)
+          existing_user = User.create(heroku_id: user_info.heroku_id, email: user_info.email)
           auther.call(rack_env)
           current_user = Pliny::RequestStore.store[:current_user]
 
           expect(current_user).to_not be_nil
-          expect(current_user.heroku_id).to eq(@user_info.heroku_id)
+          expect(current_user.heroku_id).to eq(user_info.heroku_id)
           expect(current_user.id).to eq(existing_user.id)
         end
 
@@ -61,7 +62,7 @@ module Middleware
             auther.call(rack_env)
           }.to change(User, :count).by(1)
           expect(Pliny::RequestStore.store[:current_user]).to_not be_nil
-          expect(Pliny::RequestStore.store[:current_user].heroku_id).to eq(@user_info.heroku_id)
+          expect(Pliny::RequestStore.store[:current_user].heroku_id).to eq(user_info.heroku_id)
         end
 
         describe "caching" do
@@ -81,8 +82,8 @@ module Middleware
     end
 
     it "raises Redis::Retry when redis is down" do
-      @user_info = HerokuAPIMock.create_heroku_user
-      allow(rack_auth).to receive_messages(provided?: true, basic?: true, credentials: ["", @user_info.api_key])
+      user_info = HerokuAPIMock.create_heroku_user
+      allow(rack_auth).to receive_messages(provided?: true, basic?: true, credentials: ["", user_info.api_key])
 
       allow(auther).to receive(:parse_api_key).with(anything).and_raise(Redis::CannotConnectError)
       expect { auther.call(rack_env) }.to raise_error(Redis::Retry::Error)

@@ -11,7 +11,7 @@ class Redis
         log(opts[:attempts], successful: true)
       end
 
-    rescue Redis::BaseConnectionError => e
+    rescue Redis::BaseConnectionError
       opts[:attempts] += 1
 
       if Time.now < opts[:finish_time]
