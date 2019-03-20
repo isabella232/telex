@@ -77,6 +77,11 @@ end
 
 def stub_heroku_api(&block)
   stub = block ? Sinatra.new(HerokuApiStub, &block) : HerokuApiStub
-  WebMock.stub_request(:any, %r{#{Config.heroku_api_url}/.*}).
-    to_rack(stub)
+
+  api_config = Addressable::URI.parse(Config.heroku_api_url)
+  heroku_api_url = api_config.dup.tap { |uri| uri.userinfo = nil }
+
+  WebMock.stub_request(:any, %r{#{heroku_api_url}/.*})
+    .with(basic_auth: [api_config.user, api_config.password])
+    .to_rack(stub)
 end

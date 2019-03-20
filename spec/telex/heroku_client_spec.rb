@@ -1,69 +1,69 @@
-require 'spec_helper'
+require "spec_helper"
 
-describe Telex::HerokuClient, '#new' do
-  it 'uses config for the default uri' do
-    uri_string = Telex::HerokuClient.new.uri.to_s
+describe Telex::HerokuClient, "#new" do
+  include HerokuAPIMock
+
+  let(:client) { Telex::HerokuClient.new }
+
+  it "uses config for the default uri" do
+    uri_string = client.uri.to_s
     expect(uri_string).to eq(Config.heroku_api_url)
     expect(uri_string).to_not be_blank
   end
 
-  it 'allows subsutition of another api key' do
+  it "allows subsutition of another api key" do
     key = SecureRandom.uuid
     uri = Telex::HerokuClient.new(api_key: key).uri
     expect(uri.to_s).to_not eq(Config.heroku_api_url)
     expect(uri.password).to eq(key)
   end
 
-  it 'passes the current request-id' do
-    Pliny::RequestStore.store[:request_id] = '12345'
-    client = Telex::HerokuClient.new
-    stub_request(:get, "#{client.uri}/teams/foobar/members").
-      with(headers: {'Request-Id'=>'12345'}).
-      to_return(status: 200, body: [{'id' => 1}].to_json)
+  it "passes the current request-id" do
+    Pliny::RequestStore.store[:request_id] = "12345"
 
-    expect(client.team_members('foobar')).to eql([{'id' => 1}])
+    stub_heroku_api_request(:get, "#{client.uri}/teams/foobar/members")
+      .with(headers: {"Request-Id" => "12345"})
+      .to_return(status: 200, body: [{"id" => 1}].to_json)
+
+    expect(client.team_members("foobar")).to eql([{"id" => 1}])
   end
 
-  it 'handles requests' do
-    client = Telex::HerokuClient.new
-    stub_request(:get, "#{client.uri}/teams/foobar/members").
-      to_return(status: 200, body: [{'id' => 1}].to_json)
+  it "handles requests" do
+    stub_heroku_api_request(:get, "#{client.uri}/teams/foobar/members")
+      .to_return(status: 200, body: [{"id" => 1}].to_json)
 
-    expect(client.team_members('foobar')).to eql([{'id' => 1}])
+    expect(client.team_members("foobar")).to eql([{"id" => 1}])
   end
 
-  it 'handles ranges' do
-    client = Telex::HerokuClient.new
-    stub_request(:get, "#{client.uri}/teams/foobar/members").
-      with(headers: {'Range'=>'id ..; max=1000;'}).
-      to_return(
+  it "handles ranges" do
+    stub_heroku_api_request(:get, "#{client.uri}/teams/foobar/members")
+      .with(headers: {"Range" => "id ..; max=1000;"})
+      .to_return(
         status: 206,
-        body: [{'id' => 1}].to_json,
+        body: [{"id" => 1}].to_json,
         headers: {
-          'Next-Range' => ']1..; max=1000;'
+          "Next-Range" => "]1..; max=1000;"
         }
       )
 
-      stub_request(:get, "#{client.uri}/teams/foobar/members").
-        with(headers: {'Range'=>']1..; max=1000;'}).
-        to_return(status: 206, body: [{'id' => 2}].to_json)
+    stub_heroku_api_request(:get, "#{client.uri}/teams/foobar/members")
+      .with(headers: {"Range" => "]1..; max=1000;"})
+      .to_return(status: 206, body: [{"id" => 2}].to_json)
 
-    expect(client.team_members('foobar')).to eql([{'id' => 1}, {'id' => 2}])
+    expect(client.team_members("foobar")).to eql([{"id" => 1}, {"id" => 2}])
   end
 
-  it 'raises a NotFound error on 404s' do
-    client = Telex::HerokuClient.new
-    stub_request(:get, "#{client.uri}/teams/foobar/members").
-      to_return(status: 404)
+  it "raises a NotFound error on 404s" do
+    stub_heroku_api_request(:get, "#{client.uri}/teams/foobar/members")
+      .to_return(status: 404)
 
-    expect { client.team_members('foobar') }.
-      to raise_error(Telex::HerokuClient::NotFound)
+    expect { client.team_members("foobar") }
+      .to(raise_error(Telex::HerokuClient::NotFound))
   end
 
-  describe 'capabilities endpoint' do
-    it 'returns true/false from matching response' do
+  describe "capabilities endpoint" do
+    it "returns true/false from matching response" do
       id = SecureRandom.uuid
-      client = Telex::HerokuClient.new
 
       responses = [
         ['{ "capabilities": [{"capable": true}] }', true],
@@ -71,67 +71,61 @@ describe Telex::HerokuClient, '#new' do
       ]
 
       responses.each do |payload, capable|
-        stub_request(:put, "#{client.uri}/users/~/capabilities").
-          with(
-            :body => {
+        stub_heroku_api_request(:put, "#{client.uri}/users/~/capabilities")
+          .with(
+            body: {
               capabilities: [{
                 capability: "view_metrics",
                 resource_id: id,
                 resource_type: "app"
               }]
             }.to_json
-          ).to_return(:status => 200, :body => payload, :headers => {})
+          ).to_return(status: 200, body: payload, headers: {})
 
         expect(client.capable?(type: "app", id: id, capability: "view_metrics")).to eql(capable)
       end
     end
 
-    it 'throws bad response on incomplete JSON payload response' do
+    it "throws bad response on incomplete JSON payload response" do
       id = SecureRandom.uuid
-      client = Telex::HerokuClient.new
 
       bad_responses = [
-        '{}',
+        "{}",
         '{ "capabilities": null }',
         '{ "capabilities": [] }',
       ]
 
       bad_responses.each do |bad_response|
-        stub_request(:put, "#{client.uri}/users/~/capabilities").
-          with(
-            :body => {
+        stub_heroku_api_request(:put, "#{client.uri}/users/~/capabilities")
+          .with(
+            body: {
               capabilities: [{
                 capability: "view_metrics",
                 resource_id: id,
                 resource_type: "app"
               }]
             }.to_json
-          ).to_return(:status => 200, :body => bad_response, :headers => {})
+          ).to_return(status: 200, body: bad_response, headers: {})
 
-        expect { client.capable?(type: "app", id: id, capability: "view_metrics") }.
-          to raise_error(Telex::HerokuClient::BadResponse)
+        expect { client.capable?(type: "app", id: id, capability: "view_metrics") }
+          .to(raise_error(Telex::HerokuClient::BadResponse))
       end
     end
 
-    it 'throws unauthorized on a 401 response' do
-      client = Telex::HerokuClient.new
+    it "throws unauthorized on a 401 response" do
+      stub_heroku_api_request(:put, "#{client.uri}/users/~/capabilities")
+        .to_return(status: 401, body: "", headers: {})
 
-      stub_request(:put, "#{client.uri}/users/~/capabilities")
-        .to_return(:status => 401, :body => "", :headers => {})
-
-      expect { client.capable?(type: "app", id: "123", capability: "view_metrics") }.
-        to raise_error(Pliny::Errors::Unauthorized)
+      expect { client.capable?(type: "app", id: "123", capability: "view_metrics") }
+        .to(raise_error(Pliny::Errors::Unauthorized))
     end
 
-    it 'throws forbidden on a 403 response' do
-      client = Telex::HerokuClient.new
+    it "throws forbidden on a 403 response" do
+      stub_heroku_api_request(:put, "#{client.uri}/users/~/capabilities")
+        .to_return(status: 403, body: "", headers: {})
 
-      stub_request(:put, "#{client.uri}/users/~/capabilities")
-        .to_return(:status => 403, :body => "", :headers => {})
-
-      expect { client.capable?(type: "app", id: "123", capability: "view_metrics") }.
-        to raise_error(Pliny::Errors::Forbidden)
+      expect { client.capable?(type: "app", id: "123", capability: "view_metrics") }
+        .to(raise_error(Pliny::Errors::Forbidden))
     end
-
   end
 end

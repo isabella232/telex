@@ -1,7 +1,7 @@
 source "https://rubygems.org"
 
 ruby "2.6.2"
-#ruby-gemset=telex
+# ruby-gemset=telex
 
 gem "clockwork"
 gem "erubis"
@@ -28,8 +28,8 @@ gem "sinatra-contrib", require: ["sinatra/namespace", "sinatra/reloader"]
 gem "sinatra-router"
 gem "sucker_punch"
 
-source 'https://packagecloud.io/heroku/gemgate/' do
-  gem "rollbar-blanket", "~> 0.1.9"
+source "https://packagecloud.io/heroku/gemgate/" do
+  gem "rollbar-blanket", "~> 1.0.0"
   gem "blacklist_hash", "~> 1.0.0"
 end
 
@@ -42,6 +42,7 @@ group :development do
 end
 
 group :test do
+  gem "addressable"
   gem "committee"
   gem "database_cleaner"
   gem "fabrication"
@@ -49,5 +50,5 @@ group :test do
   gem "guard-rspec"
   gem "rack-test"
   gem "rspec"
-  gem "webmock", "~> 1.21"
+  gem "webmock", "~> 3.5"
 end

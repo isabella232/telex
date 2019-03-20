@@ -11,11 +11,11 @@ GEM
       public_suffix (>= 2.0.2, < 4.0)
     backports (3.12.0)
     blacklist_hash (1.0.0)
-    byebug (11.0.0)
+    byebug (11.0.1)
     clockwork (2.0.3)
       tzinfo
     coderay (1.1.2)
-    committee (3.0.0)
+    committee (3.0.1)
       json_schema (~> 0.14, >= 0.14.3)
       openapi_parser (>= 0.2.2)
       rack (>= 1.5)
@@ -68,7 +68,7 @@ GEM
       nenv (~> 0.1)
       shellany (~> 0.0)
     oj (3.7.10)
-    openapi_parser (0.2.2)
+    openapi_parser (0.2.3)
     pg (1.1.4)
     pliny (0.27.0)
       activesupport (~> 5.0, >= 5.0.1)
@@ -108,7 +108,7 @@ GEM
     redis (4.1.0)
     rollbar (2.19.2)
       multi_json
-    rollbar-blanket (0.1.9)
+    rollbar-blanket (1.0.0)
     rspec (3.8.0)
       rspec-core (~> 3.8.0)
       rspec-expectations (~> 3.8.0)
@@ -156,7 +156,7 @@ GEM
     tilt (2.0.9)
     tzinfo (1.2.5)
       thread_safe (~> 0.1)
-    webmock (1.24.6)
+    webmock (3.5.1)
       addressable (>= 2.3.6)
       crack (>= 0.3.2)
       hashdiff
@@ -166,6 +166,7 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
+  addressable
   blacklist_hash (~> 1.0.0)!
   clockwork
   committee
@@ -191,7 +192,7 @@ DEPENDENCIES
   rake
   redcarpet
   rollbar
-  rollbar-blanket (~> 0.1.9)!
+  rollbar-blanket (~> 1.0.0)!
   rspec
   sequel (~> 4.30)
   sequel-paranoid
@@ -201,7 +202,7 @@ DEPENDENCIES
   sinatra-contrib
   sinatra-router
   sucker_punch
-  webmock (~> 1.21)
+  webmock (~> 3.5)
 
 RUBY VERSION
    ruby 2.6.2p47

@@ -1,6 +1,7 @@
 require "spec_helper"
 
 describe Endpoints::ProducerAPI::Messages do
+  include HerokuAPIMock
   include Rack::Test::Methods
 
   def app
@@ -10,31 +11,31 @@ describe Endpoints::ProducerAPI::Messages do
   before do
     header "Content-Type", "application/json"
 
-    producer = Fabricate(:producer, api_key: 'foo')
-    authorize producer.id, 'foo'
+    producer = Fabricate(:producer, api_key: "foo")
+    authorize(producer.id, "foo")
 
-    @h_user1 = HerokuAPIMock.create_heroku_user
+    @h_user1 = create_heroku_user
     Fabricate(:user, email: "outdated@email.com", heroku_id: @h_user1.heroku_id)
-    @h_user2 = HerokuAPIMock.create_heroku_user
-    heroku_app = HerokuAPIMock.create_heroku_app(owner: @h_user1, collaborators:[@h_user1, @h_user2])
+    @h_user2 = create_heroku_user
+    heroku_app = create_heroku_app(owner: @h_user1, collaborators: [@h_user1, @h_user2])
 
     @message_body = {
       title: Faker::Company.bs,
       body: Faker::Company.bs,
-      target: {type: 'app', id: heroku_app.id}
+      target: {type: "app", id: heroku_app.id}
     }
   end
 
   def do_message_post
     response = nil
     Sidekiq::Testing.inline! do
-      response = post '/producer/messages', MultiJson.encode(@message_body)
+      response = post "/producer/messages", MultiJson.encode(@message_body)
       expect(response.status).to eq(201)
     end
-    MultiJson.decode(response.body)['id']
+    MultiJson.decode(response.body)["id"]
   end
 
-  it 'works on the initial message' do
+  it "works on the initial message" do
     # sanity checks
     expect(User.count).to eq(1)
     existing_user = User.first
@@ -61,12 +62,12 @@ describe Endpoints::ProducerAPI::Messages do
     expect(deliveries.size).to eq(2)
   end
 
-  it 'allows followup' do
+  it "allows followup" do
     id = do_message_post
     Mail::TestMailer.deliveries.clear
 
     Sidekiq::Testing.inline! do
-      response = post "/producer/messages/#{id}/followups", MultiJson.encode( {body: Faker::Company.bs} )
+      response = post "/producer/messages/#{id}/followups", MultiJson.encode({body: Faker::Company.bs})
       expect(response.status).to eq(201)
     end
 

@@ -1,6 +1,7 @@
 require "spec_helper"
 
 describe Endpoints::ProducerAPI::Messages do
+  include HerokuAPIMock
   include Rack::Test::Methods
 
   def app
@@ -10,26 +11,26 @@ describe Endpoints::ProducerAPI::Messages do
   before do
     header "Content-Type", "application/json"
 
-    producer = Fabricate(:producer, api_key: 'foo')
-    authorize producer.id, 'foo'
+    producer = Fabricate(:producer, api_key: "foo")
+    authorize(producer.id, "foo")
 
-    @h_user = HerokuAPIMock.create_heroku_user
+    @h_user = create_heroku_user
     Fabricate(:user, email: "outdated@email.com", heroku_id: @h_user.heroku_id)
-    @unused_user = HerokuAPIMock.create_heroku_user
+    @unused_user = create_heroku_user
     Fabricate(:user, email: "outdated@email.com", heroku_id: @unused_user.heroku_id)
 
     @message_body = {
       title: Faker::Company.bs,
       body: Faker::Company.bs,
-      target: {type: 'user', id: @h_user.heroku_id}
+      target: {type: "user", id: @h_user.heroku_id}
     }
   end
 
   def do_post
-    post '/producer/messages', MultiJson.encode(@message_body)
+    post "/producer/messages", MultiJson.encode(@message_body)
   end
 
-  it 'works' do
+  it "works" do
     # sanity checks
     expect(User.count).to eq(2)
     existing_user = User.first
