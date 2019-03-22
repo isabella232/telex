@@ -29,8 +29,8 @@ gem "sinatra-router"
 gem "sucker_punch"
 
 source "https://packagecloud.io/heroku/gemgate/" do
+  gem "blacklist_hash", "~> 2.0.0"
   gem "rollbar-blanket", "~> 1.0.0"
-  gem "blacklist_hash", "~> 1.0.0"
 end
 
 group :development, :test do
