@@ -42,10 +42,22 @@ on Slack for assistance.
 
 ## Setup
 
-To run locally:
-
 ```
 $ bin/setup
+```
+
+### Running locally
+
+Leverage `heroku local`, or a similar Procfile tool to spin things up:
+
+```shell
+heroku local web,worker,clock
+```
+
+### Local dev console
+
+```shell
+heroku local:run bin/console
 ```
 
 To deploy to the platform:

@@ -1,44 +1,46 @@
-require 'webmock'
+require "webmock"
+
 module HerokuAPIMock
   include WebMock::API
-  extend self
 
   HerokuMockUser = Struct.new(:heroku_id, :email, :api_key)
+
   def create_heroku_user
     user = HerokuMockUser.new(SecureRandom.uuid, Faker::Internet.email, SecureRandom.uuid)
 
     user_response = MultiJson.encode({
-      "email"      => user.email,
-      "id"         => user.heroku_id,
+      "email" => user.email,
+      "id" => user.heroku_id,
       "last_login" => Time.now.utc.iso8601
     })
 
     # intended for user finder, looking up current email address using telex's key
-    stub_request(:get, "#{Config.heroku_api_url}/account")
+    stub_heroku_api_request(:get, "#{Config.heroku_api_url}/account")
       .with(headers: {"User" => user.heroku_id})
       .to_return(body: user_response)
 
     # intended for user api auth using the user's token
-    stub_request(:get, "https://telex:#{user.api_key}@api.heroku.com/account")
+    stub_heroku_api_request(:get, "#{Config.heroku_api_url}/account", api_key: user.api_key)
       .to_return(body: user_response)
 
-    return user
+    user
   end
 
   HerokuMockApp = Struct.new(:id)
-  def create_heroku_app(owner:, collaborators:[])
+
+  def create_heroku_app(owner:, collaborators: [])
     app = HerokuMockApp.new(SecureRandom.uuid)
     app_response = {
       "name" => "example",
-        "owner" => {
-          "email" => owner.email,
-          "id" => owner.heroku_id
-         }
+      "owner" => {
+        "email" => owner.email,
+        "id" => owner.heroku_id
+      }
     }
-    stub_request(:get, "#{Config.heroku_api_url}/apps/#{app.id}")
+    stub_heroku_api_request(:get, "#{Config.heroku_api_url}/apps/#{app.id}")
       .to_return(body: MultiJson.encode(app_response))
 
-    collab_response = collaborators.map do |user|
+    collab_response = collaborators.map { |user|
       {
         "created_at" => "2012-01-01T12:00:00Z",
         "id" => SecureRandom.uuid,
@@ -49,10 +51,22 @@ module HerokuAPIMock
           "two_factor_authentication" => false
         }
       }
-    end
-    stub_request(:get, "#{Config.heroku_api_url}/apps/#{app.id}/collaborators")
-      .to_return( body: MultiJson.encode(collab_response) )
+    }
 
-    return app
+    stub_heroku_api_request(:get, "#{Config.heroku_api_url}/apps/#{app.id}/collaborators")
+      .to_return(body: MultiJson.encode(collab_response))
+
+    app
+  end
+
+  def stub_heroku_api_request(method, url, api_key: nil)
+    api_config = Addressable::URI.parse(url)
+    api_config.password = api_key if api_key
+
+    # Strip Basic auth from URL since Excon will send it as an AUTHORIZATION header, so Webmock won't match the request.
+    heroku_api_uri = api_config.dup.tap { |uri| uri.userinfo = nil }
+
+    stub_request(method, heroku_api_uri)
+      .with(basic_auth: [api_config.user, api_config.password])
   end
 end

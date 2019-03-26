@@ -1,5 +1,7 @@
 language: ruby
 cache: bundler
+before_install:
+  - gem install bundler # Ensure Bundler 2.0 is on the system.
 before_script:
   - gem update --system
   - gem install bundler
@@ -11,7 +13,7 @@ services:
   - redis-server
 env:
 rvm:
-  - 2.4.4
+  - 2.6.2
 notifications:
   email: false
 sudo: false

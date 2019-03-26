@@ -1,7 +1,7 @@
 source "https://rubygems.org"
 
-ruby "2.4.4"
-#ruby-gemset=telex
+ruby "2.6.2"
+# ruby-gemset=telex
 
 gem "clockwork"
 gem "erubis"
@@ -11,7 +11,7 @@ gem "multi_json"
 gem "oj"
 gem "pg"
 gem "pliny", "~> 0.16"
-gem "pry", require: false
+gem "pry", require: false # Make Pry available in production `heroku console` sessions
 gem "pry-doc", require: false
 gem "puma", "~> 3.11"
 gem "rack-ssl"
@@ -28,9 +28,9 @@ gem "sinatra-contrib", require: ["sinatra/namespace", "sinatra/reloader"]
 gem "sinatra-router"
 gem "sucker_punch"
 
-source 'https://packagecloud.io/heroku/gemgate/' do
-  gem "rollbar-blanket", "~> 0.1.9"
-  gem "blacklist_hash", "~> 1.0.0"
+source "https://packagecloud.io/heroku/gemgate/" do
+  gem "blacklist_hash", "~> 2.0.0"
+  gem "rollbar-blanket", "~> 1.0.0"
 end
 
 group :development, :test do
@@ -39,10 +39,10 @@ end
 
 group :development do
   gem "dotenv"
-  gem "foreman"
 end
 
 group :test do
+  gem "addressable"
   gem "committee"
   gem "database_cleaner"
   gem "fabrication"
@@ -50,5 +50,5 @@ group :test do
   gem "guard-rspec"
   gem "rack-test"
   gem "rspec"
-  gem "webmock", "~> 1.21"
+  gem "webmock", "~> 3.5"
 end
