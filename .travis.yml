@@ -10,7 +10,14 @@ before_script:
 script: bundle exec rspec
 bundler_args: --local
 services:
+  - postgresql
   - redis-server
+addons:
+  postgresql: "10"
+  apt:
+    packages:
+    - postgresql-10
+    - postgresql-client-10
 env:
 rvm:
   - 2.6.2
