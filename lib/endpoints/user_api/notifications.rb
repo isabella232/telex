@@ -19,6 +19,13 @@ module Endpoints
         end
       end
 
+      get '/unread-count' do
+        redis_retry do
+          unread_count = Mediators::Notifications::UnreadCounter.run(user: current_user)
+          encode({unread_count: unread_count})
+        end
+      end
+
       get '/:id/read.png' do |id|
         note = ::Notification[id: id]
         raise Pliny::Errors::NotFound unless note

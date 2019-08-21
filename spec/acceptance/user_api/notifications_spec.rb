@@ -56,6 +56,60 @@ describe Endpoints::UserAPI::Notifications do
     end
   end
 
+  describe "GET /user/notifications/unread-count" do
+    context "with good creds" do
+      let(:heroku_user) { create_heroku_user }
+      let(:user) { Fabricate(:user, heroku_id: heroku_user.heroku_id, email: heroku_user.email) }
+
+      before do
+        login(heroku_user.api_key)
+      end
+
+      context "with unread notifications for the user" do
+        before do
+          Fabricate(:notification, user: user)
+        end
+
+        it "returns the correct unread count" do
+          do_get
+          body = JSON.parse(last_response.body)
+          expect(last_response.status).to eq(200)
+          expect(body["unread_count"]).to eq(1)
+        end
+      end
+
+      context "with unread notifications for another user" do
+        let(:another_heroku_user) { create_heroku_user }
+        let(:another_user) { Fabricate(:user, heroku_id: another_heroku_user.heroku_id, email: another_heroku_user.email) }
+
+        before do
+          Fabricate(:notification, user: user)
+          Fabricate(:notification, user: another_user)
+        end
+
+        it "does not include other users' unread messages in unread count" do
+          do_get
+          body = JSON.parse(last_response.body)
+          expect(last_response.status).to eq(200)
+          expect(body["unread_count"]).to eq(1)
+        end
+      end
+
+      context "with no notifications" do
+        it "returns 0 for the unread count" do
+          do_get
+          body = JSON.parse(last_response.body)
+          expect(last_response.status).to eq(200)
+          expect(body["unread_count"]).to eq(0)
+        end
+      end
+    end
+
+    def do_get
+      get "/user/notifications/unread-count"
+    end
+  end
+
   describe "PATCH /user/notifications/:id" do
     let(:notification) { Fabricate(:notification, user: user) }
     let(:user) { Fabricate(:user, heroku_id: heroku_user.heroku_id, email: heroku_user.email) }
