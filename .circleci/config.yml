@@ -1,0 +1,21 @@
+---
+version: 2.1
+
+workflows:
+  version: 2
+  do-nothing-important:
+    jobs:
+      - noop
+
+jobs:
+  noop:
+    docker:
+      - image: heroku/heroku:18
+
+    steps:
+      - run:
+          name: "NO-OP; do nothing, but exit successfully"
+          command: |
+            echo "Running a NO-OP on CircleCI."
+            echo "Please add real config to your '.circleci/config.yml'"
+            true
