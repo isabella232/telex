@@ -73,7 +73,7 @@ h config:set API_KEY_HMAC_SECRET=$(dd if=/dev/urandom bs=127 count=1 2>/dev/null
 h config:set HEROKU_API_URL=https://telex:<key>@api.heroku.com
 
 git push heroku master
-h run rake db:migrate
+heroku run bin/rake db:migrate
 ```
 
 ## Operations
