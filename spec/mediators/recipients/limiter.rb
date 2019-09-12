@@ -1,6 +1,4 @@
-require "spec_helper"
-
-describe Mediators::Recipients::Limiter do
+RSpec.describe Mediators::Recipients::Limiter do
   before do
     @app_info = {
       "id" => SecureRandom.uuid,

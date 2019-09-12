@@ -1,12 +1,12 @@
 require "spec_helper"
 
-describe Mediators::Messages::Cleanup do
+RSpec.describe Mediators::Messages::Cleanup do
   before do
     @mediator = Mediators::Messages::Cleanup.new
 
     old_notification = Fabricate(:notification)
     old_message = old_notification.message
-    old_message.update(created_at: Time.now - 60*60*24*31*4)
+    old_message.update(created_at: Time.now - 60 * 60 * 24 * 31 * 4)
     old_followup = Fabricate(:followup, message: old_message)
     @old_things = [old_notification, old_message, old_followup]
     @old_user = old_notification.user
@@ -20,7 +20,7 @@ describe Mediators::Messages::Cleanup do
     @current_producer = current_message.producer
   end
 
-  it 'destroys *only* old messages, and therefore their followups and notifications' do
+  it "destroys *only* old messages, and therefore their followups and notifications" do
     @mediator.call
 
     [@old_user, @old_producer, @current_user, @current_producer].each do |thing|

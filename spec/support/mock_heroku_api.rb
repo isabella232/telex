@@ -11,7 +11,7 @@ module HerokuAPIMock
     user_response = MultiJson.encode({
       "email" => user.email,
       "id" => user.heroku_id,
-      "last_login" => Time.now.utc.iso8601
+      "last_login" => Time.now.utc.iso8601,
     })
 
     # intended for user finder, looking up current email address using telex's key
@@ -34,8 +34,8 @@ module HerokuAPIMock
       "name" => "example",
       "owner" => {
         "email" => owner.email,
-        "id" => owner.heroku_id
-      }
+        "id" => owner.heroku_id,
+      },
     }
     stub_heroku_api_request(:get, "#{Config.heroku_api_url}/apps/#{app.id}")
       .to_return(body: MultiJson.encode(app_response))
@@ -48,8 +48,8 @@ module HerokuAPIMock
         "user" => {
           "email" => user.email,
           "id" => user.heroku_id,
-          "two_factor_authentication" => false
-        }
+          "two_factor_authentication" => false,
+        },
       }
     }
 

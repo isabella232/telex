@@ -1,7 +1,5 @@
-require "spec_helper"
-
-describe Mediators::Recipients::Verifier do
-  let(:app_info) {{ "name" => "myapp" }}
+RSpec.describe Mediators::Recipients::Verifier do
+  let(:app_info) { {"name" => "myapp"} }
 
   it "verifies and makes active" do
     recipient = Fabricate(:recipient, active: false, verified: false)
@@ -14,7 +12,7 @@ describe Mediators::Recipients::Verifier do
   it "throws NotFound on bad token" do
     recipient = Fabricate(:recipient, active: false, verified: false)
 
-    expect { described_class.run(recipient: recipient, token: "whatever") }.
-      to raise_error(Mediators::Recipients::NotFound)
+    expect { described_class.run(recipient: recipient, token: "whatever") }
+      .to raise_error(Mediators::Recipients::NotFound)
   end
 end

@@ -1,11 +1,9 @@
-require "spec_helper"
-
-describe Endpoints::ProducerAPI::Users do
+RSpec.describe Endpoints::ProducerAPI::Users do
   include Rack::Test::Methods
 
   def app
     Rack::Builder.new do
-      use Pliny::Middleware::RescueErrors  # so we get status, not exceptions
+      use Pliny::Middleware::RescueErrors # so we get status, not exceptions
       run Endpoints::ProducerAPI::Users
     end
   end
@@ -32,16 +30,16 @@ describe Endpoints::ProducerAPI::Users do
     end
 
     context "with an authorized user" do
-      let(:producer) { Fabricate(:producer, name: 'a-known-producer') }
+      let(:producer) { Fabricate(:producer, name: "a-known-producer") }
       let(:user) { Fabricate(:user) }
 
       before do
-        allow(Config).to receive(:users_endpoint_authorized_producers) { [ producer.name ] }
+        allow(Config).to receive(:users_endpoint_authorized_producers) { [producer.name] }
       end
 
-      it 'lists users' do
+      it "lists users" do
         expect(Mediators::Messages::AppUserFinder).to receive(:run).with(target_id: app_id) {
-          [ UserWithRole.new(:admin, user) ]
+          [UserWithRole.new(:admin, user)]
         }
         get "/apps/#{app_id}/users"
         expect(last_response.status).to eq 200
@@ -50,8 +48,8 @@ describe Endpoints::ProducerAPI::Users do
           "role" => "admin",
           "user" => {
             "email" => user.email,
-            "id" => user.id
-          }
+            "id" => user.id,
+          },
         }]
       end
 

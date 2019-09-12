@@ -1,6 +1,4 @@
-require "spec_helper"
-
-describe Endpoints::UserAPI::Notifications do
+RSpec.describe Endpoints::UserAPI::Notifications do
   include HerokuAPIMock
   include Committee::Test::Methods
   include Rack::Test::Methods
