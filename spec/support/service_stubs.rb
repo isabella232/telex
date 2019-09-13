@@ -34,9 +34,10 @@ class HerokuApiStub < Sinatra::Base
 
   get "/account" do
     MultiJson.encode(
-      id:         env["HTTP_USER"],
-      email:      "username@example.com",
-      last_login: Time.now.utc.iso8601)
+      id: env["HTTP_USER"],
+      email: "username@example.com",
+      last_login: Time.now.utc.iso8601
+    )
   end
 
   get "/apps/:id" do |id|
@@ -44,9 +45,10 @@ class HerokuApiStub < Sinatra::Base
       name: "example",
       id: APP_ID,
       owner: {
-        id:    OWNER_ID,
+        id: OWNER_ID,
         email: "username@example.com",
-      })
+      }
+    )
   end
 
   get "/apps/:id/collaborators" do
@@ -54,23 +56,23 @@ class HerokuApiStub < Sinatra::Base
       {
         id: SecureRandom.uuid,
         user: {
-          id:    COLLAB1_ID,
-          email: "username2@example.com"
-        }
+          id: COLLAB1_ID,
+          email: "username2@example.com",
+        },
       },
       {
         id: SecureRandom.uuid,
         user: {
-          id:    COLLAB2_ID,
-          email: "username3@example.com"
-        }
+          id: COLLAB2_ID,
+          email: "username3@example.com",
+        },
       },
     ])
   end
 
   put "/users/~/capabilities" do
     MultiJson.encode({
-      "capabilities" => [{"capable" => true}]
+      "capabilities" => [{"capable" => true}],
     })
   end
 end

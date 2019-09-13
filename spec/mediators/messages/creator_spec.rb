@@ -1,6 +1,4 @@
-require "spec_helper"
-
-describe Mediators::Messages::Creator do
+RSpec.describe Mediators::Messages::Creator do
   include HerokuAPIMock
 
   let(:creator_user) {

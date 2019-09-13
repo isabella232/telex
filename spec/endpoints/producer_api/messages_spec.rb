@@ -1,11 +1,9 @@
-require "spec_helper"
-
-describe Endpoints::ProducerAPI::Messages do
+RSpec.describe Endpoints::ProducerAPI::Messages do
   include Rack::Test::Methods
 
   def app
     Rack::Builder.new do
-      use Pliny::Middleware::RescueErrors  # so we get status, not exceptions
+      use Pliny::Middleware::RescueErrors # so we get status, not exceptions
       run Endpoints::ProducerAPI::Messages
     end
   end
@@ -22,41 +20,41 @@ describe Endpoints::ProducerAPI::Messages do
 
     before do
       @message_body = {
-        title: 'Congratulations',
-        body: 'You are a winner',
-        action: {url: 'https://foo', label: 'Redeem prize!'},
-        target: {type: 'user', id: SecureRandom.uuid}
+        title: "Congratulations",
+        body: "You are a winner",
+        action: {url: "https://foo", label: "Redeem prize!"},
+        target: {type: "user", id: SecureRandom.uuid},
       }
     end
 
-    context 'with good params' do
+    context "with good params" do
       it "succeeds" do
         do_post
         expect(last_response.status).to eq(201)
       end
 
-      it 'creates a message' do
+      it "creates a message" do
         expect(Message.where(producer: @producer).count).to eq(0)
         do_post
         expect(Message.where(producer: @producer).count).to eq(1)
         msg = Message.last
-        expect(msg.title).to eq('Congratulations')
-        expect(msg.body).to eq('You are a winner')
-        expect(msg.action_label).to eq('Redeem prize!')
-        expect(msg.action_url).to eq('https://foo')
-        expect(msg.target_type).to eq('user')
+        expect(msg.title).to eq("Congratulations")
+        expect(msg.body).to eq("You are a winner")
+        expect(msg.action_label).to eq("Redeem prize!")
+        expect(msg.action_url).to eq("https://foo")
+        expect(msg.target_type).to eq("user")
       end
 
       it "returns the message's id" do
         do_post
         response = MultiJson.decode(last_response.body)
-        expect( Message[id: response['id']] ).to_not be_nil
+        expect(Message[id: response["id"]]).to_not be_nil
       end
     end
 
-    context 'with bad params' do
+    context "with bad params" do
       before do
-        @message_body[:body] = ''
+        @message_body[:body] = ""
       end
 
       it "fails" do
@@ -80,11 +78,11 @@ describe Endpoints::ProducerAPI::Messages do
     before do
       @message = Fabricate(:message, producer: @producer)
       @followup_body = {
-        body: 'You actually are not a winner :(',
+        body: "You actually are not a winner :(",
       }
     end
 
-    context 'with good params' do
+    context "with good params" do
       it "succeeds" do
         do_post
         expect(last_response.status).to eq(201)
@@ -97,7 +95,7 @@ describe Endpoints::ProducerAPI::Messages do
         expect(last_response.status).to eq(201)
       end
 
-      it 'creates a followup' do
+      it "creates a followup" do
         expect(Followup.where(message_id: @message.id).count).to eq(0)
         do_post
         expect(Followup.where(message_id: @message.id).count).to eq(1)
@@ -106,11 +104,11 @@ describe Endpoints::ProducerAPI::Messages do
       it "returns the followup's id" do
         do_post
         response = MultiJson.decode(last_response.body)
-        expect( Followup[id: response['id']] ).to_not be_nil
+        expect(Followup[id: response["id"]]).to_not be_nil
       end
     end
 
-    context 'with bad params' do
+    context "with bad params" do
       it "fails with non existance message" do
         allow(Message).to receive(:[]).and_return(nil)
         do_post
@@ -118,13 +116,13 @@ describe Endpoints::ProducerAPI::Messages do
       end
 
       it "fails with an empty body" do
-        @followup_body[:body] = ''
+        @followup_body[:body] = ""
         do_post
         expect(last_response.status).to eq(422)
       end
 
       it "fails with a malformed message_id" do
-        @message.id = 'whatever'
+        @message.id = "whatever"
         do_post
         expect(last_response.status).to eq(422)
       end

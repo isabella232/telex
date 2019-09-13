@@ -1,6 +1,4 @@
-require "spec_helper"
-
-describe Mediators::Recipients::TemplateFinder do
+RSpec.describe Mediators::Recipients::TemplateFinder do
   it "throws exception when the env var is not found" do
     expect {
       described_class.run(template: "kwyjibo")

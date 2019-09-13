@@ -1,6 +1,7 @@
 # 𝕋𝔼𝕃𝔼𝕏
 
-[![Build Status](https://travis-ci.org/heroku/telex.svg)](https://travis-ci.org/heroku/telex)
+[![Build Status](https://circleci.com/gh/heroku/telex.svg?style=svg)](https://circleci.com/gh/heroku/telex)
+[![Maintainability](https://api.codeclimate.com/v1/badges/f23b929ebd51edf45dfd/maintainability)](https://codeclimate.com/repos/53ebf597e30ba01158015b7a/maintainability)
 
 ![telex](docs/telex-cc-by-sa-jens-ohlig.jpg)
 
@@ -73,9 +74,20 @@ h config:set API_KEY_HMAC_SECRET=$(dd if=/dev/urandom bs=127 count=1 2>/dev/null
 h config:set HEROKU_API_URL=https://telex:<key>@api.heroku.com
 
 git push heroku master
-h run rake db:migrate
+heroku run bin/rake db:migrate
 ```
 
 ## Operations
 
 Refer to [our internal guide on Telex](https://github.com/heroku/engineering-docs/blob/master/components/telex/README.md)
+
+### Dashboards, Errors, etc…
+
+[Heroku Pipeline](https://dashboard.heroku.com/pipelines/fc112685-54b5-4b3d-8e7d-54924fa3af4d) |
+[Watchtower Checks](https://watchtower.herokai.com/apps/telex) |
+[Continuous Integration](https://circleci.com/gh/heroku/workflows/telex) |
+[Errors](https://rollbar.com/Heroku-3/telex/) |
+[Code Quality](https://codeclimate.com/repos/53ebf597e30ba01158015b7a) |
+Charts: [Prod](https://metrics.librato.com/s/spaces/54073) / [Staging](https://metrics.librato.com/s/spaces/54074) |
+[Logs](https://splunk.herokai.com/en-US/app/search/search/?q=search%20index%3Dmain%20app%3Dtelex) |
+[Herokai Dashboards](https://dashboards.herokai.com)

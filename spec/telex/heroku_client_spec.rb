@@ -1,6 +1,4 @@
-require "spec_helper"
-
-describe Telex::HerokuClient, "#new" do
+RSpec.describe Telex::HerokuClient, "#new" do
   include HerokuAPIMock
 
   let(:client) { Telex::HerokuClient.new }
@@ -42,7 +40,7 @@ describe Telex::HerokuClient, "#new" do
         status: 206,
         body: [{"id" => 1}].to_json,
         headers: {
-          "Next-Range" => "]1..; max=1000;"
+          "Next-Range" => "]1..; max=1000;",
         }
       )
 
@@ -77,8 +75,8 @@ describe Telex::HerokuClient, "#new" do
               capabilities: [{
                 capability: "view_metrics",
                 resource_id: id,
-                resource_type: "app"
-              }]
+                resource_type: "app",
+              }],
             }.to_json
           ).to_return(status: 200, body: payload, headers: {})
 
@@ -102,8 +100,8 @@ describe Telex::HerokuClient, "#new" do
               capabilities: [{
                 capability: "view_metrics",
                 resource_id: id,
-                resource_type: "app"
-              }]
+                resource_type: "app",
+              }],
             }.to_json
           ).to_return(status: 200, body: bad_response, headers: {})
 

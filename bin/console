@@ -6,7 +6,7 @@ require 'pry'
 def basic_prompt(target_self, nest_level, pry)
   # override CONSOLE_BANNER to include something like a release identifier
   nesting = nest_level.zero? ? "" : ":#{nest_level}"
-  "[#{pry.input_array.size}] #{console_prefix}(#{Pry.view_clip(target_self)})#{nesting}"
+  "[#{pry.input_ring.size}] #{console_prefix}(#{Pry.view_clip(target_self)})#{nesting}"
 end
 
 def console_prefix

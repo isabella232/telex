@@ -1,6 +1,4 @@
-require "spec_helper"
-
-describe Mediators::Recipients::Creator do
+RSpec.describe Mediators::Recipients::Creator do
   before do
     @app_info = {
       "id" => SecureRandom.uuid,
@@ -18,9 +16,9 @@ describe Mediators::Recipients::Creator do
         app_info: @app_info, recipient: kind_of(Recipient),
         template: "alerting",
       )
-      
+
       result = nil
-      expect{ result = @creator.call }.to change(Recipient, :count).by(1)
+      expect { result = @creator.call }.to change(Recipient, :count).by(1)
       expect(result).to be_instance_of(Recipient)
     end
   end

@@ -1,11 +1,8 @@
-# encoding: utf-8
-require "spec_helper"
-
-describe Endpoints::AppAPI::Recipients do
+RSpec.describe Endpoints::AppAPI::Recipients do
   include Rack::Test::Methods
 
   let :heroku_client do
-    Telex::HerokuClient.new(api_key: 'a_very_secret_api_key')
+    Telex::HerokuClient.new(api_key: "a_very_secret_api_key")
   end
 
   let :app_id do
@@ -28,14 +25,14 @@ describe Endpoints::AppAPI::Recipients do
     it "succeeds" do
       get "/#{app_id}/recipients"
       expect(last_response.status).to eq(200)
-      expect(last_response.body).to eq('[]')
+      expect(last_response.body).to eq("[]")
     end
   end
 
   describe "POST /apps/:app_id/recipients" do
     bodies = [
-      '{}',
-      '',
+      "{}",
+      "",
       '{"email":""}',
       '{"email":"foo@example.com"}',
     ]
@@ -51,19 +48,19 @@ describe Endpoints::AppAPI::Recipients do
       end
 
       it "explains why a body is bad" do
-        post "#{app_id}/recipients", { email: "yolo@yolo.com", template: "alerting" }.to_json
+        post "#{app_id}/recipients", {email: "yolo@yolo.com", template: "alerting"}.to_json
         expect(last_response.status).to eq(400)
         expect(last_response.body).to include("`body` should have {{app}} and {{token}}")
       end
 
       it "explains why a title is bad" do
-        post "#{app_id}/recipients", { email: "yolo@yolo.com", template: "alerting" }.to_json
+        post "#{app_id}/recipients", {email: "yolo@yolo.com", template: "alerting"}.to_json
         expect(last_response.status).to eq(400)
         expect(last_response.body).to include("`title` is required")
       end
 
       it "can create a new recipient" do
-        post "/#{app_id}/recipients", { email: "yolo@yolo.com", template: "alerting" }.to_json
+        post "/#{app_id}/recipients", {email: "yolo@yolo.com", template: "alerting"}.to_json
         expect(last_response.status).to eq(201)
 
         expect(Recipient[email: "yolo@yolo.com", app_id: app_id]).to_not be_nil
@@ -72,7 +69,7 @@ describe Endpoints::AppAPI::Recipients do
 
     it "returns a 500 if redis is unavailable" do
       allow(Mediators::Recipients::Creator).to receive(:run).and_raise(Redis::BaseConnectionError)
-      post "/#{app_id}/recipients", { email: "yolo@yolo.com", template: "alerting" }.to_json
+      post "/#{app_id}/recipients", {email: "yolo@yolo.com", template: "alerting"}.to_json
 
       expect(last_response.status).to eq(500)
     end
@@ -86,22 +83,22 @@ describe Endpoints::AppAPI::Recipients do
     it "404s on expired token" do
       recipient.update(verification_sent_at: Time.now.utc - (Recipient::VERIFICATION_TOKEN_TTL * 2))
 
-      put "/#{app_id}/recipients/#{recipient.id}/verify", { token: recipient.verification_token }.to_json
+      put "/#{app_id}/recipients/#{recipient.id}/verify", {token: recipient.verification_token}.to_json
       expect(last_response.status).to eq(404)
     end
 
     it "404s on bad token" do
-      put "/#{app_id}/recipients/#{recipient.id}/verify", { token: "" }.to_json
+      put "/#{app_id}/recipients/#{recipient.id}/verify", {token: ""}.to_json
       expect(last_response.status).to eq(404)
     end
 
     it "404s on bad recipient id" do
-      put "/#{app_id}/recipients/#{SecureRandom.uuid}/verify", { token: "" }.to_json
+      put "/#{app_id}/recipients/#{SecureRandom.uuid}/verify", {token: ""}.to_json
       expect(last_response.status).to eq(404)
     end
 
     it "verifies the recipient" do
-      put "/#{app_id}/recipients/#{recipient.id}/verify", { token: recipient.verification_token }.to_json
+      put "/#{app_id}/recipients/#{recipient.id}/verify", {token: recipient.verification_token}.to_json
       expect(last_response.status).to eq(204)
 
       recipient.reload
@@ -118,7 +115,7 @@ describe Endpoints::AppAPI::Recipients do
 
       it "allows a token to be refreshed via title/body" do
         old_token = recipient.verification_token
-        patch "/#{app_id}/recipients/#{recipient.id}", { template: "alerting" }.to_json
+        patch "/#{app_id}/recipients/#{recipient.id}", {template: "alerting"}.to_json
         expect(last_response.status).to eq(200)
 
         recipient.reload
@@ -126,7 +123,7 @@ describe Endpoints::AppAPI::Recipients do
       end
 
       it "allows to de-activate" do
-        patch "/#{app_id}/recipients/#{recipient.id}", { active: false }.to_json
+        patch "/#{app_id}/recipients/#{recipient.id}", {active: false}.to_json
         expect(last_response.status).to eq(200)
 
         recipient.reload
@@ -162,7 +159,7 @@ describe Endpoints::AppAPI::Recipients do
       expect(last_response.status).to eq(204)
 
       Mediators::Recipients::TemplateFinder.setup(template: "alerting", title: "hello", body: "%{app} %{token}") do
-        post "/#{app_id}/recipients", { email: recipient.email, template: "alerting" }.to_json
+        post "/#{app_id}/recipients", {email: recipient.email, template: "alerting"}.to_json
         expect(last_response.status).to eq(201)
       end
     end

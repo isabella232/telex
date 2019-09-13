@@ -5,7 +5,7 @@ def count_selects
 
   yield
 
-  s.string.split(' ').grep(/SELECT/).count
+  s.string.split(" ").grep(/SELECT/).count
 ensure
   Sequel::Model.db.loggers.delete(l)
 end

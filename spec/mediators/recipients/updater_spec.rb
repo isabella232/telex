@@ -1,7 +1,5 @@
-require "spec_helper"
-
-describe Mediators::Recipients::Updater do
-  let(:app_info) {{ "id" => SecureRandom.uuid, "name" => "myapp" }}
+RSpec.describe Mediators::Recipients::Updater do
+  let(:app_info) { {"id" => SecureRandom.uuid, "name" => "myapp"} }
 
   it "can change from active to inactive" do
     recipient = Fabricate(:recipient)

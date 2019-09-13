@@ -1,6 +1,4 @@
-require "spec_helper"
-
-describe Mediators::Recipients::Deleter do
+RSpec.describe Mediators::Recipients::Deleter do
   it "deletes" do
     set = Recipient.where(deleted_at: nil)
     recipient = Fabricate(:recipient)

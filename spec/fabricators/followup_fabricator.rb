@@ -1,4 +1,4 @@
 Fabricator(:followup) do
   message
-  body       { Faker::Company.bs }
+  body { Faker::Company.bs }
 end

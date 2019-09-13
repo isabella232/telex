@@ -1,11 +1,9 @@
-require "spec_helper"
-
-describe Mediators::Recipients::Emailer do
-  let(:app_info) {{ "name" => "myapp" }}
+RSpec.describe Mediators::Recipients::Emailer do
+  let(:app_info) { {"name" => "myapp"} }
   let(:recipient) { Fabricate(:recipient) }
 
   it "sends an email given recipient / app_info" do
-    emailer = double()
+    emailer = double
     args = {
       email: recipient.email,
       notification_id: Pliny::Middleware::RequestID::UUID_PATTERN,
@@ -20,7 +18,7 @@ describe Mediators::Recipients::Emailer do
   end
 
   it "leaves other var-looking things in the body alone" do
-    emailer = double()
+    emailer = double
     args = {
       email: recipient.email,
       notification_id: Pliny::Middleware::RequestID::UUID_PATTERN,

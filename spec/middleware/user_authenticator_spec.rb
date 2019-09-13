@@ -1,7 +1,5 @@
-require "spec_helper"
-
 module Middleware
-  describe ProducerAuthenticator do
+  RSpec.describe ProducerAuthenticator do
     include HerokuAPIMock
 
     subject(:auther) { UserAuthenticator.new(app) }

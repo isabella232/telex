@@ -1,6 +1,4 @@
-require "spec_helper"
-
-describe Endpoints::UserAPI::Notifications do
+RSpec.describe Endpoints::UserAPI::Notifications do
   include Rack::Test::Methods
 
   before do

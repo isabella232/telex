@@ -1,6 +1,4 @@
-require "spec_helper"
-
-describe Middleware::Instrumentation do
+RSpec.describe Middleware::Instrumentation do
   include Rack::Test::Methods
 
   def app
