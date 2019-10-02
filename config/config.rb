@@ -24,6 +24,7 @@ module Config
   optional :console_banner
   optional :versioning_app_name
   optional :versioning_default
+  optional :database_log_level
 
   # Override -- value is returned or the set default
   override :cache_user_auth,  true,  bool

@@ -8,3 +8,9 @@ end
 DB = Sequel.connect(Config.database_url,
                     max_connections: Config.db_pool,
                     after_connect: database_setup_proc)
+
+if Config.database_log_level
+  DB.loggers << Logger.new(Pliny.stdout || $stdout)
+  DB.log_connection_info = true
+  DB.sql_log_level = Config.database_log_level
+end
