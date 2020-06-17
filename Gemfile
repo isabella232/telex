@@ -22,8 +22,8 @@ gem "sequel", "~> 4.30"
 gem "sequel-paranoid"
 gem "sequel_pg", require: "sequel"
 gem "sidekiq", ">= 5.2.5"
-gem "sinatra", "~> 2.0", ">= 2.0.0", require: "sinatra/base"
-gem "sinatra-contrib", "~> 2.0", require: ["sinatra/namespace", "sinatra/reloader"]
+gem "sinatra", "~> 2.0", ">= 2.0.8.1", require: "sinatra/base"
+gem "sinatra-contrib", "2.0.8.1", require: ["sinatra/namespace"
 gem "sinatra-router", ">= 0.2.4"
 gem "sucker_punch"
 
