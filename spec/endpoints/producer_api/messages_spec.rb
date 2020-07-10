@@ -21,7 +21,7 @@ RSpec.describe Endpoints::ProducerAPI::Messages do
     before do
       @message_body = {
         title: "Congratulations",
-        body: "You are a winner",
+        body: "You are a winner. 100%",
         action: {url: "https://foo", label: "Redeem prize!"},
         target: {type: "user", id: SecureRandom.uuid},
       }

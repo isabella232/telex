@@ -13,7 +13,7 @@ RSpec.describe Mediators::Messages::Creator do
   let(:creator_app) {
     described_class.new(producer: producer,
                         title: "{{app}}",
-                        body: "{{app}}",
+                        body: body,
                         action_label: "Do something!",
                         action_url: Faker::Internet.url,
                         target_type: "app",
@@ -21,6 +21,7 @@ RSpec.describe Mediators::Messages::Creator do
   }
   let(:producer) { Fabricate(:producer) }
   let(:app) { create_heroku_app(owner: create_heroku_user) }
+  let(:body) { "{{app}}" }
 
   it "creates a message" do
     result = nil
@@ -32,6 +33,16 @@ RSpec.describe Mediators::Messages::Creator do
     result = creator_app.call
     expect(result.title).to eq("example")
     expect(result.body).to eq("example")
+  end
+
+  context "with a inane bug" do
+    let(:body) { "%" }
+
+    it "templates a percent symbol" do
+      result = creator_app.call
+      expect(result.title).to eq("example")
+      expect(result.body).to eq("%")
+    end
   end
 
   it "enqueues a MessagePlex job" do
