@@ -26,10 +26,10 @@ module HerokuAPIMock
     user
   end
 
-  HerokuMockApp = Struct.new(:id)
+  HerokuMockApp = Struct.new(:id, :owner, :collaborators)
 
-  def create_heroku_app(owner:, collaborators: [])
-    app = HerokuMockApp.new(SecureRandom.uuid)
+  def create_heroku_app(owner:, collaborators: [], id: SecureRandom.uuid)
+    app = HerokuMockApp.new(id, owner, collaborators)
     app_response = {
       "name" => "example",
       "owner" => {
@@ -57,6 +57,18 @@ module HerokuAPIMock
       .to_return(body: MultiJson.encode(collab_response))
 
     app
+  end
+
+  # If you call create_heroku_app with an existing app id and different owners or collabs than
+  # what's already associated with the app, it will rewrite the mocked
+  # responses for that app id to reflect the change in ownership or
+  # collaborators.
+
+  # This method calls create to rewrite the mocked collab response for a given app,
+  # with the goal of being more obvious that an update is happening, rather than
+  # calling create_heroku_app twice in the same test.
+  def update_app_collaborators(app, collaborators)
+    create_heroku_app(id: app.id, collaborators: collaborators, owner: app.owner)
   end
 
   def stub_heroku_api_request(method, url, api_key: nil)

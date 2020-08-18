@@ -1,10 +1,12 @@
 module Mediators::Followups
   class Notifier < Mediators::Base
     attr_accessor :followup, :message, :notifications
-    def initialize(followup: )
+    def initialize(followup:)
       self.followup = followup
       self.message = followup.message
-      self.notifications = message.notifications
+      self.notifications = Mediators::Followups::NotificationUpdater.run(
+        followup: followup
+      )
     end
 
     def call
@@ -16,8 +18,7 @@ module Mediators::Followups
 
     def update_users
       notifications.each do |note|
-        user = note.user
-        Mediators::Messages::UserUserFinder.run(target_id: user.heroku_id)
+        Mediators::Messages::UserUserFinder.run(target_id: note.user.heroku_id)
       end
     end
 
