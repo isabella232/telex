@@ -45,11 +45,11 @@ module Mediators::Followups
     end
 
     def current_collab_hids
-      current_collabs.map {|c| c.user.heroku_id }
+      @current_collab_hids ||= current_collabs.map {|c| c.user.heroku_id }
     end
 
     def current_collabs
-      Mediators::Messages::UserFinder.from_message(message).call
+      @current_collabs ||= Mediators::Messages::UserFinder.from_message(message).call
     end
   end
 end
