@@ -12,6 +12,13 @@ module Endpoints
         end
       end
 
+      patch '/mark-all-as-read' do
+        redis_retry do
+          updated = Mediators::Notifications::ReadAll.run(user: current_user)
+          encode({updated: updated})
+        end
+      end
+
       patch '/:id' do |id|
         redis_retry do
           note = Mediators::Notifications::ReadStatusUpdater.run(notification: get_note(id), read_status: get_status)
